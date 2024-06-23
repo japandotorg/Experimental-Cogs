@@ -65,8 +65,11 @@ class Downloader(_Downloader):
         if len(repos) == 0:
             joined = "There are no repos installed."
         else:
-            joined = "# Installed Repo\n"
-        for repo in repos:
-            joined += "+ {}: {}".format(repo.name, self._format_repo(repo, formatting))
+            if len(repos) > 1:
+                joined = "#Installed Repos\n"
+            else:
+                joined = "# Installed Repo\n"
+            for repo in repos:
+                joined += "+ {}: {}".format(repo.name, self._format_repo(repo, formatting))
         for page in pagify(joined, ["\n"], shorten_by=16):
             await ctx.send(box(page, lang="markdown"))
