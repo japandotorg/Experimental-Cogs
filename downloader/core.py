@@ -63,14 +63,18 @@ class Downloader(_Downloader):
         repos: List[Repo] = sorted(
             self._repo_manager.repos, key=lambda r: str.lower(r.name)
         )
+        installed: List[str] = []
         if len(repos) == 0:
-            joined = "There are no repos installed."
+            head = "There are no repos installed."
         else:
             if len(repos) > 1:
-                joined = "#Installed Repos\n"
+                head = "#Installed Repos\n"
             else:
-                joined = "# Installed Repo\n"
-            for repo in repos:
-                joined += "+ {}: {}".format(repo.name, self._format_repo(repo, formatting))
+                head = "# Installed Repo\n"
+            installed = [
+                "+ {}: {}".format(item.name, self._format_repo(item, formatting))
+                for item in repos
+            ]
+        joined = f"{head}\n" + "\n".join(installed)
         for page in pagify(joined, ["\n"], shorten_by=16):
             await ctx.send(box(page, lang="markdown"))
