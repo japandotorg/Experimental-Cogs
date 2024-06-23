@@ -35,10 +35,14 @@ class Downloader(_Downloader):
         )
         return output.body  # type: ignore
 
-    _repo_list = None  # type: ignore
+    @repo.group(name="custom")
+    async def _repo_custom(self, _: commands.Context) -> None:
+        """
+        Experimental Downloader Commands.
+        """
 
-    @repo.command(name="llist")
-    async def _repo_list(
+    @_repo_custom.command(name="list")
+    async def _repo_custom_list(
         self, ctx: commands.Context, *, formatting: str = "{repo}"
     ) -> None:
         """
