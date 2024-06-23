@@ -37,7 +37,7 @@ class Downloader(_Downloader):
 
     _repo_list = None  # type: ignore
 
-    @repo.command(name="list")
+    @repo.command(name="llist")
     async def _repo_list(
         self, ctx: commands.Context, *, formatting: str = "{repo}"
     ) -> None:
