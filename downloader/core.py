@@ -12,6 +12,7 @@ from ._tagscript import RepoAdapter
 
 
 class Downloader(_Downloader):
+    __doc__ = _Downloader.__doc__
 
     repo: commands.Group = cast(commands.Group, _Downloader.repo.copy())
 
