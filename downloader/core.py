@@ -28,7 +28,6 @@ class Downloader(_Downloader):
     PIP_INSTALL: ClassVar[str] = "{python} -m pip install -U -t {target} {requirements}"
 
     repo: commands.Group = cast(commands.Group, _Downloader.repo.copy())
-    _old_pip: commands.Command = cast(commands.Command, _Downloader.pipinstall.copy())
 
     def __init__(self, bot: Red) -> None:
         super().__init__(bot)
@@ -85,9 +84,21 @@ class Downloader(_Downloader):
         )
 
     @commands.is_owner()
-    @discord.utils.copy_doc(_old_pip)
     @commands.command(require_var_positional=True)
     async def pipinstall(self, ctx: commands.Context, *deps: str) -> None:
+        """
+        Install a group of dependencies using pip.
+
+        Examples:
+        - `[p]pipinstall bs4`
+        - `[p]pipinstall py-cpuinfo psutil`
+
+        Improper usage of this command can break your bot, be careful.
+
+        **Arguments**
+
+        - `<deps...>` The package or packages you wish to install.
+        """
         async with ctx.typing():
             response: str = await self._pip(deps, self.LIB_PATH)
         embeds: List[discord.Embed] = []
