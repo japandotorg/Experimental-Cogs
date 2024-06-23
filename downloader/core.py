@@ -84,21 +84,8 @@ class Downloader(_Downloader):
         )
 
     @commands.is_owner()
-    @commands.command(require_var_positional=True)
+    @commands.command(require_var_positional=True, help=_Downloader.pipinstall.help)
     async def pipinstall(self, ctx: commands.Context, *deps: str) -> None:
-        """
-        Install a group of dependencies using pip.
-
-        Examples:
-        - `[p]pipinstall bs4`
-        - `[p]pipinstall py-cpuinfo psutil`
-
-        Improper usage of this command can break your bot, be careful.
-
-        **Arguments**
-
-        - `<deps...>` The package or packages you wish to install.
-        """
         async with ctx.typing():
             response: str = await self._pip(deps, self.LIB_PATH)
         embeds: List[discord.Embed] = []
