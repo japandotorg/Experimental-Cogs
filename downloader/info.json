@@ -1,0 +1,19 @@
+{
+    "author": [
+        "Cog-Creators",
+        "inthedark.org"
+    ],
+    "install_msg": "This cog subclasses core Downloader and implements a few more things. (USE AT YOUR OWN RISK!)",
+    "name": "Downloader",
+    "disabled": false,
+    "short": "Modified Downloader Cog. (USE AT YOUR OWN RISK!)",
+    "description": "Core Downloader with the addition of a few more things. (USE AT YOUR OWN RISK!)",
+    "tags": [
+        "downloader"
+    ],
+    "requirements": [
+        "AdvancedTagScriptEngine"
+    ],
+    "min_bot_version": "3.5.0",
+    "hidden": false
+}
