@@ -171,7 +171,7 @@ class Downloader(_Downloader):
 
     @cog.command(name="list")
     async def _cog_list(
-        self, ctx: commands.Context, repo: Repo, *, formatting: str = "{cog}"
+        self, ctx: commands.Context, repo: Repo, *, formatting: str = "{cog(short)}"
     ) -> None:
         """List all available cogs from a single repo.
 
