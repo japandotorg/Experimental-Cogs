@@ -178,16 +178,6 @@ class Downloader(_Downloader):
         for page in pagify(joined, ["\n"], shorten_by=16):
             await ctx.send(box(page, lang="markdown"))
 
-    cog.remove_command("update")
-
-    @cog.command(name="update", help=_Downloader._cog_update.help)
-    async def _cog_update(
-        self, ctx: commands.Context, reload: Optional[bool], *cogs: InstalledCog
-    ) -> None:
-        if reload:
-            ctx.assume_yes = True
-        await self._cog_update_logic(ctx, cogs=list(cogs))
-
     cog.remove_command("list")
 
     @cog.command(name="list")
