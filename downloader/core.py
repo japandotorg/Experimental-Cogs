@@ -14,6 +14,7 @@ from redbot.core.bot import Red
 from redbot.cogs.downloader.repo_manager import Repo
 from redbot.core.utils.menus import close_menu, menu, DEFAULT_CONTROLS
 from redbot.core.utils.chat_formatting import pagify, box
+from redbot.cogs.downloader.converters import InstalledCog
 from redbot.cogs.downloader.downloader import Downloader as _Downloader
 from redbot.cogs.downloader.repo_manager import ProcessFormatter
 
@@ -28,6 +29,7 @@ class Downloader(_Downloader):
     PIP_INSTALL: ClassVar[str] = "{python} -m pip install -U -t {target} {requirements}"
 
     repo: commands.Group = cast(commands.Group, _Downloader.repo.copy())
+    cog: commands.Group = cast(commands.Group, _Downloader.cog.copy())
 
     def __init__(self, bot: Red) -> None:
         super().__init__(bot)
@@ -139,3 +141,13 @@ class Downloader(_Downloader):
         joined = f"{head}\n" + "\n".join(installed)
         for page in pagify(joined, ["\n"], shorten_by=16):
             await ctx.send(box(page, lang="markdown"))
+
+    cog.remove_command("update")
+
+    @cog.command(name="update", help=_Downloader._cog_update.help)
+    async def _cog_update(
+        self, ctx: commands.Context, reload: bool = True, *cogs: InstalledCog
+    ) -> None:
+        if reload:
+            ctx.assume_yes = True
+        await self._cog_update_logic(ctx, cogs=list(cogs))
