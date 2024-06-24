@@ -116,7 +116,7 @@ class Downloader(_Downloader):
             view.dismiss_button.emoji = (
                 "\N{HEAVY MULTIPLICATION X}\N{VARIATION SELECTOR-16}"
             )
-            view.dismiss_button.style = discord.ButtonStyle.green
+            view.dismiss_button.style = discord.ButtonStyle.red
             view.dismiss_button.label = None
             view.message = await ctx.send(message, view=view)
             await view.wait()
