@@ -12,13 +12,13 @@ import discord
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.cogs.downloader.repo_manager import Repo
+from redbot.core.utils.views import ConfirmView
 from redbot.core.utils.menus import close_menu, menu, DEFAULT_CONTROLS
 from redbot.core.utils.chat_formatting import pagify, box
 from redbot.cogs.downloader.downloader import Downloader as _Downloader
 from redbot.cogs.downloader.installable import Installable, InstalledModule
 from redbot.cogs.downloader.repo_manager import ProcessFormatter
 
-from .common.views import UpdateView
 from .common._tagscript import RepoAdapter, CogAdapter
 
 
@@ -109,8 +109,12 @@ class Downloader(_Downloader):
                 if len(updated_cognames) > 1
                 else "Would you like to reload the updated cog?"
             )
-            confirm: bool = await UpdateView.confirm(ctx, message)
-            if not confirm:
+            view: ConfirmView = ConfirmView(ctx.author)
+            view.confirm_button.style = discord.ButtonStyle.green
+            view.dismiss_button.style = discord.ButtonStyle.green
+            view.message = await ctx.send(message, view=view)
+            await view.wait()
+            if not view.result:
                 return
         await ctx.invoke(ctx.bot.get_cog("Core").reload, *updated_cognames)
 
