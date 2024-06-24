@@ -14,7 +14,6 @@ from redbot.core.bot import Red
 from redbot.cogs.downloader.repo_manager import Repo
 from redbot.core.utils.menus import close_menu, menu, DEFAULT_CONTROLS
 from redbot.core.utils.chat_formatting import pagify, box
-from redbot.cogs.downloader.converters import InstalledCog
 from redbot.cogs.downloader.downloader import Downloader as _Downloader
 from redbot.cogs.downloader.installable import Installable, InstalledModule
 from redbot.cogs.downloader.repo_manager import ProcessFormatter
