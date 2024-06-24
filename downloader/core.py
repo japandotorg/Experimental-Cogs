@@ -130,18 +130,16 @@ class Downloader(_Downloader):
     async def pipinstall(self, ctx: commands.Context, *deps: str) -> None:
         async with ctx.typing():
             response: str = ReplaceVars(await self._pip(deps, self.LIB_PATH)).replace()
-        embeds: List[discord.Embed] = []
         pages: List[str] = [p for p in pagify(response)]
-        for index, page in enumerate(pages):
-            embed: discord.Embed = discord.Embed(
-                description=box(page), color=await ctx.embed_color()
-            )
-            embed.set_footer(text="Page {}/{}".format(index + 1, len(pages)))
-            embeds.append(embed)
+        formatted: List[str] = [
+            f"{box('Page {}/{}'.format(index + 1, len(pages)))}\n\n"
+            f"{box(page, lang='powershell')}"
+            for index, page in enumerate(pages)
+        ]
         controls = (
-            {"\N{CROSS MARK}": close_menu} if len(embeds) == 1 else DEFAULT_CONTROLS
+            {"\N{CROSS MARK}": close_menu} if len(formatted) == 1 else DEFAULT_CONTROLS
         )
-        await menu(ctx, embeds, controls=controls, timeout=120.0)  # type: ignore
+        await menu(ctx, formatted, controls=controls, timeout=120.0)  # type: ignore
 
     repo.remove_command("list")
 
