@@ -146,8 +146,8 @@ class Downloader(_Downloader):
 
     @cog.command(name="update", help=_Downloader._cog_update.help)
     async def _cog_update(
-        self, ctx: commands.Context, reload: bool = True, *cogs: InstalledCog
+        self, ctx: commands.Context, reload: Optional[bool], *cogs: InstalledCog
     ) -> None:
-        if reload:
+        if reload or reload is None:
             ctx.assume_yes = True
         await self._cog_update_logic(ctx, cogs=list(cogs))
