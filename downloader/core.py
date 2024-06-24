@@ -109,7 +109,7 @@ class Downloader(_Downloader):
                 if len(updated_cognames) > 1
                 else "Would you like to reload the updated cog?"
             )
-            view: ConfirmView = ConfirmView(ctx.author)
+            view: ConfirmView = ConfirmView(ctx.author, disable_buttons=True)
             view.confirm_button.style = discord.ButtonStyle.green
             view.dismiss_button.style = discord.ButtonStyle.green
             view.message = await ctx.send(message, view=view)
