@@ -110,8 +110,14 @@ class Downloader(_Downloader):
                 else "Would you like to reload the updated cog?"
             )
             view: ConfirmView = ConfirmView(ctx.author, disable_buttons=True)
+            view.confirm_button.emoji = "\N{HEAVY CHECK MARK}\N{VARIATION SELECTOR-16}"
             view.confirm_button.style = discord.ButtonStyle.green
+            view.confirm_button.label = None
+            view.dismiss_button.emoji = (
+                "\N{HEAVY MULTIPLICATION X}\N{VARIATION SELECTOR-16}"
+            )
             view.dismiss_button.style = discord.ButtonStyle.green
+            view.dismiss_button.label = None
             view.message = await ctx.send(message, view=view)
             await view.wait()
             if not view.result:
