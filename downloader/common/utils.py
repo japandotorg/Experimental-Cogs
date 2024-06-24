@@ -38,6 +38,9 @@ class _ReplaceVars(ABC):
 
     def __str__(self) -> str:
         return self.content.strip()
+    
+    def replace(self) -> str:
+        return self.content.strip()
 
     @abstractmethod
     def _replace(self) -> str:
@@ -46,25 +49,6 @@ class _ReplaceVars(ABC):
 
 # https://github.com/AAA3A-AAA3A/AAA3A_utils/blob/8ddc5c06be4d43cfabb96cc4cee1733581c38020/AAA3A_utils/cogsutils.py#L61-L86
 class ReplaceVars(_ReplaceVars):
-
-    ENV_VARS: ClassVar[Tuple[str, ...]] = (
-        "USERPROFILE",
-        "HOME",
-        "USERNAME",
-        "COMPUTERNAME",
-    )
-
-    def __init__(
-        self, content: str, reverse: bool = False, replacement: bool = True
-    ) -> None:
-        self.content: str = content
-        self.reverse: bool = reverse
-        self.replacement: bool = replacement
-
-        self._replace()
-
-    def replace(self) -> str:
-        return self.content
 
     def _replace(self) -> str:
         if not self.reverse:
