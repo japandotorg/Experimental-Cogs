@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from sys import executable
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, ClassVar, Iterable, List, Optional, cast
+from typing import Any, ClassVar, Iterable, List, Optional, Union, cast
 
 import TagScriptEngine as tse
 
@@ -16,9 +16,10 @@ from redbot.core.utils.menus import close_menu, menu, DEFAULT_CONTROLS
 from redbot.core.utils.chat_formatting import pagify, box
 from redbot.cogs.downloader.converters import InstalledCog
 from redbot.cogs.downloader.downloader import Downloader as _Downloader
+from redbot.cogs.downloader.installable import Installable, InstalledModule
 from redbot.cogs.downloader.repo_manager import ProcessFormatter
 
-from ._tagscript import RepoAdapter
+from .common._tagscript import RepoAdapter, CogAdapter
 
 
 class Downloader(_Downloader):
@@ -48,6 +49,14 @@ class Downloader(_Downloader):
     def _format_repo(self, repo: Repo, formatting: str) -> str:
         output: tse.Response = self.interpreter.process(
             formatting, {"repo": RepoAdapter(repo)}
+        )
+        return output.body  # type: ignore
+
+    def _format_cog(
+        self, cog: Union[Installable, InstalledModule], formatting: str
+    ) -> str:
+        output: tse.Response = self.interpreter.process(
+            formatting, {"cog": CogAdapter(cog)}
         )
         return output.body  # type: ignore
 
@@ -107,21 +116,27 @@ class Downloader(_Downloader):
 
     @repo.command(name="list")
     async def _repo_list(
-        self, ctx: commands.Context, *, formatting: str = "{repo}"
+        self, ctx: commands.Context, *, formatting: str = "{repo(url)}"
     ) -> None:
         """
         List all installed repos.
 
-        You can supply a custom formatting tagscript for each repo.
+        Example:
+        - `[p]repo list`
+        - `[p]repo list {repo(cogs)}`
+
+        **Arguments**
+
+        - `<formatting>` supply custom formatting for each repo.
 
         The ``{repo}`` block with no parameters returns the repo's full name,
-        but passing the attributes listed below to the block payload will return
+        but passing the attributes listed below to the block parameters will return
         that attribute instead.
 
-        **Usage:** ``{repo([attribute])}``
+        **Usage**: ``{repo([attribute])}``
 
-        **Attributes:** ``name``, ``url``, ``author``, ``cogs``, ``branch``,
-        ``description``, ``short`` & ``install_msg``
+        **Attributes**: ``name``, ``url``, ``author``, ``cogs``, ``branch``,
+            ``description``, ``short`` & ``install_msg``.
         """
         repos: List[Repo] = sorted(
             self._repo_manager.repos, key=lambda r: str.lower(r.name)
@@ -151,3 +166,59 @@ class Downloader(_Downloader):
         if reload or reload is None:
             ctx.assume_yes = True
         await self._cog_update_logic(ctx, cogs=list(cogs))
+
+    cog.remove_command("list")
+
+    @cog.command(name="list")
+    async def _cog_list(
+        self, ctx: commands.Context, repo: Repo, *, formatting: str = "{cog}"
+    ) -> None:
+        """List all available cogs from a single repo.
+
+        Example:
+        - `[p]cog list 26-Cogs`
+        - `[p]cog list Seina-Cogs {cog(min_bot)}`
+
+        **Arguments**
+
+        - `<repo>` The repo to list cogs from.
+        - `<formatting>` Supply custom formatting for each cog.
+
+        The `{cog}` block with no parameters returns the cog's name,
+        but passing the attributes listed below to the block parameters
+        will return the attribute instead.
+
+        **Usage**: ``{cog([attribute])}``
+
+        **Attributes**: ``name``, ``description``, ``short``, ``repo_name``,
+            ``commit``, ``author``, ``data_statement``, ``min_bot``, ``max_bot``,
+            ``min_python``, ``hidden``, ``required_cogs``, ``requirements``,
+            ``tags`` & ``install_msg``.
+        """
+        installed: List[InstalledModule] = [
+            cog for cog in await self.installed_cogs() if cog.repo_name == repo.name
+        ]
+        available: List[Installable] = [
+            cog for cog in repo.available_cogs if not (cog.hidden or cog in installed)
+        ]
+        installed_string: str = "\n".join(
+            "- {}: {}".format(cog.name, self._format_cog(cog, formatting))
+            for cog in sorted(installed, key=lambda x: x.name.lower())
+        )
+        if len(installed) > 1:
+            installed_string: str = "# Installed Cogs\n{}".format(installed_string)
+        elif installed:
+            installed_string: str = "# Installed Cog\n{}".format(installed_string)
+        available_string: str = "\n".join(
+            "+ {}: {}".format(cog.name, self._format_cog(cog, formatting))
+            for cog in sorted(available, key=lambda x: x.name.lower())
+        )
+        if not available_string:
+            cogs: str = "> Available Cogs\nNo cogs are available."
+        elif len(available) > 1:
+            cogs: str = "> Available Cogs\n{}".format(available_string)
+        else:
+            cogs: str = "> Available Cogs\\n{}".format(available_string)
+        cogs: str = cogs + "\n\n" + installed_string
+        for page in pagify(cogs, ["\n"], shorten_by=16):
+            await ctx.send(box(page, lang="markdown"))
