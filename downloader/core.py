@@ -19,6 +19,7 @@ from redbot.cogs.downloader.downloader import Downloader as _Downloader
 from redbot.cogs.downloader.installable import Installable, InstalledModule
 from redbot.cogs.downloader.repo_manager import ProcessFormatter
 
+from .common.utils import ReplaceVars
 from .common._tagscript import RepoAdapter, CogAdapter
 
 
@@ -128,7 +129,7 @@ class Downloader(_Downloader):
     @commands.command(require_var_positional=True, help=_Downloader.pipinstall.help)
     async def pipinstall(self, ctx: commands.Context, *deps: str) -> None:
         async with ctx.typing():
-            response: str = await self._pip(deps, self.LIB_PATH)
+            response: str = ReplaceVars(await self._pip(deps, self.LIB_PATH)).replace()
         embeds: List[discord.Embed] = []
         pages: List[str] = [p for p in pagify(response)]
         for index, page in enumerate(pages):
