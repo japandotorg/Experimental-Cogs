@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 from sys import executable
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, ClassVar, Iterable, List, Optional, Union, cast
+from typing import Any, ClassVar, Iterable, List, Optional, Set, Union, cast
 
 import TagScriptEngine as tse
 
@@ -19,6 +19,7 @@ from redbot.cogs.downloader.downloader import Downloader as _Downloader
 from redbot.cogs.downloader.installable import Installable, InstalledModule
 from redbot.cogs.downloader.repo_manager import ProcessFormatter
 
+from .common.views import UpdateView
 from .common._tagscript import RepoAdapter, CogAdapter
 
 
@@ -94,6 +95,26 @@ class Downloader(_Downloader):
             or process.stderr.decode("utf-8").strip()
         )
 
+    async def _ask_for_cog_reload(
+        self, ctx: commands.Context, updated_cognames: Set[str]
+    ) -> None:
+        updated_cognames &= ctx.bot.extensions.keys()
+        if not updated_cognames:
+            await ctx.send(
+                "None of the updated cogs were previously loaded. Update complete."
+            )
+            return
+        if not ctx.assume_yes:
+            message: str = (
+                "Would you like to reload the updated cogs?"
+                if len(updated_cognames) > 1
+                else "Would you like to reload the updated cog?"
+            )
+            confirm: bool = await UpdateView.confirm(ctx, message)
+            if not confirm:
+                return
+        await ctx.invoke(ctx.bot.get_cog("Core").reload, *updated_cognames)
+
     @commands.is_owner()
     @commands.command(require_var_positional=True, help=_Downloader.pipinstall.help)
     async def pipinstall(self, ctx: commands.Context, *deps: str) -> None:
@@ -163,7 +184,7 @@ class Downloader(_Downloader):
     async def _cog_update(
         self, ctx: commands.Context, reload: Optional[bool], *cogs: InstalledCog
     ) -> None:
-        if reload or reload is None:
+        if reload:
             ctx.assume_yes = True
         await self._cog_update_logic(ctx, cogs=list(cogs))
 
