@@ -1,6 +1,6 @@
 import os
 import re
-from typing import ClassVar, Dict, List, Optional, Tuple
+from typing import ClassVar, Dict, List, Tuple
 
 
 def humanize_required_cogs(data: Dict[str, str]) -> List[str]:
