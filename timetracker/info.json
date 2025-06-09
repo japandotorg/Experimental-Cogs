@@ -1,0 +1,18 @@
+{
+    "author": ["**japan.org** (`759180080328081450`)"],
+    "install_msg": "Thanks for installing the **TimeTracker** cog.",
+    "name": "TimeTracker",
+    "disabled": false,
+    "short": "TimeTracker",
+    "description": "Manually record role assignment and removal times within a server.",
+    "tags": [
+        "timetracker", "clock"
+    ],
+    "required_cogs": {},
+    "min_python_version": [3, 10, 0],
+    "requirements": [
+        "pydantic==2.11.5", "pytz==2025.2"
+    ],
+    "type": "COG",
+    "end_user_data_statement": "This cog does not store End User Data."
+}
